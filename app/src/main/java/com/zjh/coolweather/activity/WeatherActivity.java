@@ -6,6 +6,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,6 +29,7 @@ import java.io.IOException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
@@ -61,6 +65,10 @@ public class WeatherActivity extends AppCompatActivity {
     ScrollView mSvLayout;
     @BindView(R.id.iv_bg)
     ImageView mIvBg;
+    @BindView(R.id.swipe_refresh)
+    public SwipeRefreshLayout mSwipeRefresh;
+    @BindView(R.id.drawer_layout)
+    public DrawerLayout mDrawerLayout;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -74,16 +82,26 @@ public class WeatherActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         String weatherString = preferences.getString("weather", null);
+        final String weatherId;
         if (weatherString != null) {
             // 有缓存数据，就直接解析天气数据
             Weather weather = GsonUtil.handleWeatherResponse(weatherString);
+            weatherId = weather.basic.weatherId;
             showWeatherInfo(weather);
         } else {
             // 无缓存数据，从网络请求数据
-            String weatherId = getIntent().getStringExtra("weather_id");
+            weatherId = getIntent().getStringExtra("weather_id");
             mSvLayout.setVisibility(View.INVISIBLE);
             requestWeather(weatherId);
         }
+        // 下拉刷新最新天气信息
+        mSwipeRefresh.setColorSchemeResources(R.color.colorPrimary);
+        mSwipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                requestWeather(weatherId);
+            }
+        });
         // 获取必应上的每日一图，更改天气预报的背景
         String bgUrl = preferences.getString("bing_pic", null);
         if (bgUrl != null) {
@@ -105,6 +123,7 @@ public class WeatherActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         Toast.makeText(WeatherActivity.this, "获取天气信息失败", Toast.LENGTH_SHORT).show();
+                        mSwipeRefresh.setRefreshing(false);
                     }
                 });
             }
@@ -125,6 +144,7 @@ public class WeatherActivity extends AppCompatActivity {
                         } else {
                             Toast.makeText(WeatherActivity.this, "获取天气失败", Toast.LENGTH_SHORT).show();
                         }
+                        mSwipeRefresh.setRefreshing(false);
                     }
                 });
             }
@@ -193,5 +213,15 @@ public class WeatherActivity extends AppCompatActivity {
         mTvCarwash.setText(carWash);
         mTvSport.setText(sport);
         mSvLayout.setVisibility(View.VISIBLE);
+    }
+
+    @OnClick({R.id.btn_back, R.id.ll_back})
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
+            case R.id.btn_back:
+            case R.id.ll_back:
+                mDrawerLayout.openDrawer(GravityCompat.START);
+                break;
+        }
     }
 }

@@ -4,6 +4,23 @@
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize">
 
+    <LinearLayout
+        android:id="@+id/ll_back"
+        android:layout_width="50dp"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true">
+
+        <Button
+            android:id="@+id/btn_back"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:layout_marginLeft="10dp"
+            android:background="@drawable/ic_home"
+            />
+    </LinearLayout>
+
     <TextView
         android:id="@+id/tv_title"
         android:layout_width="wrap_content"
