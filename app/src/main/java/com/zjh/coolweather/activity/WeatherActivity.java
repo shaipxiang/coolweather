@@ -1,5 +1,6 @@
 package com.zjh.coolweather.activity;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
@@ -22,6 +23,7 @@ import com.bumptech.glide.Glide;
 import com.zjh.coolweather.R;
 import com.zjh.coolweather.gson.Forecast;
 import com.zjh.coolweather.gson.Weather;
+import com.zjh.coolweather.service.AutoUpdateService;
 import com.zjh.coolweather.util.GsonUtil;
 import com.zjh.coolweather.util.HttpUtil;
 
@@ -101,8 +103,8 @@ public class WeatherActivity extends AppCompatActivity {
             public void onRefresh() {
                 requestWeather(weatherId);
             }
-        });
-        // 获取必应上的每日一图，更改天气预报的背景
+
+        });        // 获取必应上的每日一图，更改天气预报的背景
         String bgUrl = preferences.getString("bing_pic", null);
         if (bgUrl != null) {
             Glide.with(this).load(bgUrl).into(mIvBg);
@@ -141,6 +143,8 @@ public class WeatherActivity extends AppCompatActivity {
                             editor.putString("weather", responseText);
                             editor.apply();
                             showWeatherInfo(weather);
+                            Intent intent = new Intent(WeatherActivity.this, AutoUpdateService.class);
+                            startService(intent);
                         } else {
                             Toast.makeText(WeatherActivity.this, "获取天气失败", Toast.LENGTH_SHORT).show();
                         }
