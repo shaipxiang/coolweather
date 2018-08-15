@@ -1,4 +1,4 @@
-package com.zjh.coolweather;
+package com.zjh.coolweather.fragment;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
@@ -15,6 +15,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.zjh.coolweather.R;
 import com.zjh.coolweather.db.City;
 import com.zjh.coolweather.db.Country;
 import com.zjh.coolweather.db.Province;
